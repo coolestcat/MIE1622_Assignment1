@@ -57,9 +57,9 @@ dates_array = datevec(dates, format_date);
 dates_array = dates_array(:,1:3);
 
 % Number of strategies
-strategy_functions = {'strat_buy_and_hold' 'strat_equally_weighted' 'strat_min_variance' 'strat_max_Sharpe'};
-strategy_names     = {'Buy and Hold' 'Equally Weighted Portfolio' 'Minimum Variance Portfolio' 'Maximum Sharpe Ratio Portfolio'};
-N_strat = 4; % comment this in your code
+strategy_functions = {'strat_buy_and_hold' 'strat_equally_weighted' 'strat_min_variance' 'strat_max_Sharpe' 'strat_max_return'};
+strategy_names     = {'Buy and Hold' 'Equally Weighted Portfolio' 'Minimum Variance Portfolio' 'Maximum Sharpe Ratio Portfolio' 'Maximum Return Portfolio'};
+N_strat = 5; % comment this in your code
 %N_strat = length(strategy_functions); % uncomment this in your code
 fh_array = cellfun(@str2func, strategy_functions, 'UniformOutput', false);
 
@@ -138,19 +138,20 @@ end
 % Plot results
 %%%%%%%%%%% Insert your code here %%%%%%%%%%%%
 figure(1);
-for(strategy = 1:N_strat)
+for(strategy = 1:4)
     plot(portf_value{strategy});
     axis([0 504 0.7*10^6 3*10^6]);
+    legend('buy and hold', 'equally weighted', 'minimum variance', 'maxmimum Sharpe Ratio');
     hold on;
 end
 
 n_assets = 20;
 periods = 12;
-strategies = 4;
+strategies = 5;
 
 y = zeros(strategies, n_assets, periods);
 % display(y(:,:,12));
-for i = 1:4
+for i = 1:strategies
     for j =1:12
         for k =1:20
             y(i,k,j) = w_opt{i,j}(k);

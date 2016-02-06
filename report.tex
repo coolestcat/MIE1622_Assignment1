@@ -1,0 +1,157 @@
+\documentclass[english]{scrartcl}
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{babel}
+\usepackage{blindtext}
+\usepackage{wrapfig,lipsum,booktabs}
+\usepackage{amsmath}
+\usepackage[none]{hyphenat}
+\usepackage{graphicx}
+\usepackage[labelfont=bf]{caption}
+\usepackage[margin=0.7in]{geometry}
+\usepackage{titling}
+\usepackage{setspace}
+\usepackage[section]{placeins}
+
+\setkomafont{disposition}{\normalfont\bfseries}
+
+\setlength{\droptitle}{-35pt}
+
+\author{Alvin Leung, ID=998949544}
+
+
+\title{\textbf{MIE 1622 Assignment 1 Report}}
+
+\date{\vspace{-5ex}}
+
+
+\begin{document}
+	
+	\maketitle
+	\section{Investment Strategies}
+	
+	 The buy and hold strategy was already implemented. The equally weighted strategy was done by setting the weight (proportion of the value of our portfolio invested in each asset) to be equal for all 20 assets. The minimum variance strategy was implemented by simply solving the quadratic optimization problem using the Q matrix in cplex, and then setting the weights equal to what the cplex solver gives. The maximum sharpe ratio was also computed using cplex, but adjusting the Q matrix, the A matrix (with the constraints that $k >= 0$, $\sum_{i} y_{i} = k$, and $\sum_{i} (\mu_{i} - r_{f})y_{i} = 1$), and upper and lower bounds to solve the modified quadratic optimization problem.  The risk-free rate $r_{f}$ was determined to be the ten-year US Treasury yield rate of 0.00184. \\
+	 
+	 For each strategy, the transaction costs were calculated and guaranteed to make our portfolio feasible (have positive cash value) given the total value of the portfolio using the following formula for the transaction cost constraint:
+	 
+	 \begin{equation}
+	 \sum_{i=0}^{n-1} n_{i}p_{i} + 0.005\sum_{i=0}^{n-1} \lvert n_{i} p_{i} - l_{i} p_{i} \rvert = \alpha
+    \end{equation}
+    
+    where $n_{i}$ represents the unknown new number of asset i,  n is 20 in our case, $p_{i}$ represents the current price of asset i, 0.005 is the transaction cost rate, $l_{i}$ is the old number of asset i (before the current rebalancing), and $\alpha$ is the current total portfolio value. We note that: \\
+    
+		 \begin{equation}
+		n_{i} p_{i} = \frac{w_{i}}{w_{0}} n_{0} p_{0}
+		 \end{equation}
+		 
+		 For any nonzero weighted asset 0, since we want the combined value of the number of stocks we buy for each asset to follow the weight $w_{i}$. The equation was then solved in matlab by iterating through the n+1 possible intervals that the unknown variable $n_{0}$ could be in, corresponding to the n absolute value terms, and finding the only solution that falls in the correct interval. \\
+		 
+		 After determining the optimal values $n_{i}$, we first round it down to ensure that the rebalanced portfolio is feasible. Then, we consider all non-zero weighted assets, and try to round them up such that it does not exceed the total value of the portfolio. This is equivalent to the knapsack problem where the weight of each item is the same as its value, and the capacity is the cash we have after buying all $n_{i}$ stocks rounded down and subtracting the transaction fee. The dynamic programming algorithm implemented in matlab has runtime O(nC), where n is the number of items (assets) and C is the cash we have left over. 
+		 
+	\section{Analysis}
+	
+	Here is the output for all the various strategies that were used to rebalance the porfolio after each 2 month period:
+	\begin{verbatim}
+	
+	Period 1: start date 01/03/05, end date 02/28/05
+	Strategy "Buy and Hold", value begin = $ 1008145.00, value end = $  994730.00
+	Strategy "Equally Weighted Portfolio", value begin = $ 1000706.70, value end = $  950415.22
+	Strategy "Minimum Variance Portfolio", value begin = $ 1001581.59, value end = $  974784.07
+	Strategy "Maximum Sharpe Ratio Portfolio", value begin = $  999058.31, value end = $ 1416479.81
+	Strategy "Maximum Return Portfolio", value begin = $  999058.31, value end = $ 1416479.81
+	
+	Period 2: start date 03/01/05, end date 04/29/05
+	Strategy "Buy and Hold", value begin = $  998500.00, value end = $  834350.00
+	Strategy "Equally Weighted Portfolio", value begin = $  952630.81, value end = $  847875.56
+	Strategy "Minimum Variance Portfolio", value begin = $  977876.37, value end = $  910038.98
+	Strategy "Maximum Sharpe Ratio Portfolio", value begin = $ 1405112.81, value end = $ 1138619.81
+	Strategy "Maximum Return Portfolio", value begin = $ 1405112.81, value end = $ 1138619.81
+	
+	Period 3: start date 05/02/05, end date 06/30/05
+	Strategy "Buy and Hold", value begin = $  836625.00, value end = $  824920.00
+	Strategy "Equally Weighted Portfolio", value begin = $  855660.48, value end = $  879433.34
+	Strategy "Minimum Variance Portfolio", value begin = $  905556.65, value end = $  916373.30
+	Strategy "Maximum Sharpe Ratio Portfolio", value begin = $ 1138857.22, value end = $ 1506996.00
+	Strategy "Maximum Return Portfolio", value begin = $ 1138857.22, value end = $ 1506996.00
+	
+	Period 4: start date 07/01/05, end date 08/31/05
+	Strategy "Buy and Hold", value begin = $  826105.00, value end = $  901880.00
+	Strategy "Equally Weighted Portfolio", value begin = $  876966.79, value end = $  941970.63
+	Strategy "Minimum Variance Portfolio", value begin = $  902301.52, value end = $  966629.99
+	Strategy "Maximum Sharpe Ratio Portfolio", value begin = $ 1477292.48, value end = $ 1428574.90
+	Strategy "Maximum Return Portfolio", value begin = $ 1492139.30, value end = $ 1465243.55
+	
+	Period 5: start date 09/01/05, end date 10/31/05
+	Strategy "Buy and Hold", value begin = $  890300.00, value end = $  926200.00
+	Strategy "Equally Weighted Portfolio", value begin = $  937328.65, value end = $  962951.31
+	Strategy "Minimum Variance Portfolio", value begin = $  961463.66, value end = $  981472.79
+	Strategy "Maximum Sharpe Ratio Portfolio", value begin = $ 1380313.65, value end = $ 1304194.65
+	Strategy "Maximum Return Portfolio", value begin = $ 1451932.36, value end = $ 1661748.61
+	
+	Period 6: start date 11/01/05, end date 12/30/05
+	Strategy "Buy and Hold", value begin = $  919665.00, value end = $  971170.00
+	Strategy "Equally Weighted Portfolio", value begin = $  951021.46, value end = $ 1037966.37
+	Strategy "Minimum Variance Portfolio", value begin = $  969023.60, value end = $ 1027364.76
+	Strategy "Maximum Sharpe Ratio Portfolio", value begin = $ 1304280.40, value end = $ 1495424.32
+	Strategy "Maximum Return Portfolio", value begin = $ 1520576.81, value end = $ 1662780.65
+	
+	Period 7: start date 01/03/06, end date 02/28/06
+	Strategy "Buy and Hold", value begin = $  984040.00, value end = $  958750.00
+	Strategy "Equally Weighted Portfolio", value begin = $ 1061643.09, value end = $ 1080016.19
+	Strategy "Minimum Variance Portfolio", value begin = $ 1040249.93, value end = $ 1059306.79
+	Strategy "Maximum Sharpe Ratio Portfolio", value begin = $ 1461693.04, value end = $ 2203781.20
+	Strategy "Maximum Return Portfolio", value begin = $ 1727066.35, value end = $ 2061282.43
+	
+	Period 8: start date 03/01/06, end date 04/28/06
+	Strategy "Buy and Hold", value begin = $  961230.00, value end = $  959330.00
+	Strategy "Equally Weighted Portfolio", value begin = $ 1092623.06, value end = $ 1070218.28
+	Strategy "Minimum Variance Portfolio", value begin = $ 1064626.88, value end = $ 1070302.39
+	Strategy "Maximum Sharpe Ratio Portfolio", value begin = $ 2260000.00, value end = $ 1877712.16
+	Strategy "Maximum Return Portfolio", value begin = $ 2114655.33, value end = $ 1756953.57
+	
+	Period 9: start date 05/01/06, end date 06/30/06
+	Strategy "Buy and Hold", value begin = $  956765.00, value end = $  877590.00
+	Strategy "Equally Weighted Portfolio", value begin = $ 1062727.15, value end = $ 1013322.10
+	Strategy "Minimum Variance Portfolio", value begin = $ 1058214.07, value end = $ 1003826.71
+	Strategy "Maximum Sharpe Ratio Portfolio", value begin = $ 1836765.86, value end = $ 1930825.58
+	Strategy "Maximum Return Portfolio", value begin = $ 1718639.63, value end = $ 1184122.55
+	
+	Period 10: start date 07/03/06, end date 08/31/06
+	Strategy "Buy and Hold", value begin = $  890780.00, value end = $  956745.00
+	Strategy "Equally Weighted Portfolio", value begin = $ 1025619.50, value end = $ 1095152.74
+	Strategy "Minimum Variance Portfolio", value begin = $ 1008098.71, value end = $ 1073631.72
+	Strategy "Maximum Sharpe Ratio Portfolio", value begin = $ 1929254.75, value end = $ 2342665.25
+	Strategy "Maximum Return Portfolio", value begin = $ 1189677.57, value end = $ 1444607.07
+	
+	Period 11: start date 09/01/06, end date 10/31/06
+	Strategy "Buy and Hold", value begin = $  961475.00, value end = $ 1085615.00
+	Strategy "Equally Weighted Portfolio", value begin = $ 1097477.39, value end = $ 1160747.76
+	Strategy "Minimum Variance Portfolio", value begin = $ 1069427.81, value end = $ 1123606.07
+	Strategy "Maximum Sharpe Ratio Portfolio", value begin = $ 2364832.66, value end = $ 2627489.32
+	Strategy "Maximum Return Portfolio", value begin = $ 1458276.65, value end = $ 1823625.31
+	
+	Period 12: start date 11/01/06, end date 12/29/06
+	Strategy "Buy and Hold", value begin = $ 1074110.00, value end = $ 1141435.00
+	Strategy "Equally Weighted Portfolio", value begin = $ 1143093.46, value end = $ 1189931.79
+	Strategy "Minimum Variance Portfolio", value begin = $ 1109981.52, value end = $ 1129376.76
+	Strategy "Maximum Sharpe Ratio Portfolio", value begin = $ 2636641.12, value end = $ 2732735.02
+	Strategy "Maximum Return Portfolio", value begin = $ 1682503.51, value end = $ 1935738.74
+	\end{verbatim}
+	
+	\begin{figure}[!htb]
+		\begin{center}
+			\includegraphics[width=0.9\textwidth, height = 0.4\textheight]{daily_value}
+			
+		\end{center}
+		\caption{Graph showing the daily value of the porfolio over all 504 trading days for each of the 4 rebalancing strategies}
+		\vspace{-10pt}
+	\end{figure}
+	
+	\section{Possible Improvements}
+	
+	
+	
+	
+	
+\end{document}
