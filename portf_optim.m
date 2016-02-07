@@ -57,9 +57,9 @@ dates_array = datevec(dates, format_date);
 dates_array = dates_array(:,1:3);
 
 % Number of strategies
-strategy_functions = {'strat_buy_and_hold' 'strat_equally_weighted' 'strat_min_variance' 'strat_max_Sharpe' 'strat_max_return'};
-strategy_names     = {'Buy and Hold' 'Equally Weighted Portfolio' 'Minimum Variance Portfolio' 'Maximum Sharpe Ratio Portfolio' 'Maximum Return Portfolio'};
-N_strat = 5; % comment this in your code
+strategy_functions = {'strat_buy_and_hold' 'strat_equally_weighted' 'strat_min_variance' 'strat_max_Sharpe' 'strat_max_return' 'strat_equally_weighted_buy_and_hold'};
+strategy_names     = {'Buy and Hold' 'Equally Weighted Portfolio' 'Minimum Variance Portfolio' 'Maximum Sharpe Ratio Portfolio' 'Maximum Return Portfolio' 'Equally Weighted Buy and Hold' };
+N_strat = 6; % comment this in your code
 %N_strat = length(strategy_functions); % uncomment this in your code
 fh_array = cellfun(@str2func, strategy_functions, 'UniformOutput', false);
 
@@ -138,10 +138,10 @@ end
 % Plot results
 %%%%%%%%%%% Insert your code here %%%%%%%%%%%%
 figure(1);
-for(strategy = 1:4)
+for(strategy = 5:6)
     plot(portf_value{strategy});
     axis([0 504 0.7*10^6 3*10^6]);
-    legend('buy and hold', 'equally weighted', 'minimum variance', 'maxmimum Sharpe Ratio');
+    legend('maximum Return', 'equally weighted buy and hold');
     hold on;
 end
 
@@ -161,7 +161,7 @@ end
 
 for strat=3:4
     figure();
-    for i=1:20
+    for i=11:15
         toPlot = zeros(1,12);
 
         % display(y(strategy,i,:));
@@ -170,6 +170,11 @@ for strat=3:4
             toPlot(j) = y(strat,i,j);
         end
         plot(toPlot);
+        %legend('MSFT', 'F', 'CRAY', 'GOOG', 'HPQ');
+        %legend('YHOO', 'JAVA', 'DELL', 'AAPL', 'IBM');
+        legend('LNVGY', 'CSCO', 'BAC', 'INTC', 'AMD');
+        %legend(	"LNVGY"	"CSCO"	"BAC"	"INTC"	"AMD"	"SNE"	"NVDA"	"AMZN"	"CREAF"	"EK");
+        
         hold on;
     end
 end
